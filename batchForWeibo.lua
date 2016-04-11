@@ -1,10 +1,14 @@
-local userConstant = {};
-userConstant.csvFile = "csvtest.csv";
-userConstant.luaFile = "csvtest.lua";
-userConstant.tableTestFile = "tabletest.lua";
+local tUser = {
+	csvFile = "csvtest.csv";
+	luaFile = "csvtest.lua";
+	tableTestFile = "tabletest.lua";
+	csvTestFile = "tabletest.csv";
+};
+
 
 dofile( "table.save-1.0.lua" );
-dofile( "csv2table.lua" );
+-- include module Csv
+local mCsv = require "csv2table"
 
 -- do
 	-- table.getn = function (t)
@@ -24,39 +28,27 @@ dofile( "csv2table.lua" );
 
 function csv2table()
     local t = {}
-    t = LoadCsv(userConstant.csvFile);
-    table.save( t, userConstant.luaFile );
+    t = mCsv.load(tUser.csvFile);
+    table.save( t, tUser.luaFile );
 end
 
 function saveTableTest()
 	local t = { {1},{2,},{5}}
-	table.save( t, userConstant.tableTestFile );
+	table.save( t, tUser.tableTestFile );
 end
 
--- Used to escape "'s by toCSV
-function escapeCSV (s)
-  if string.find(s, '[,"]') then
-    s = '"' .. string.gsub(s, '"', '""') .. '"'
-  end
-  return s
-end
-
--- Convert from table to CSV string
-function toCSV (tt)
-  local s = ""
--- ChM 23.02.2014: changed pairs to ipairs 
--- assumption is that fromCSV and toCSV maintain data as ordered array
-  for _,p in ipairs(tt) do  
-    s = s .. "," .. escapeCSV(p)
-  end
-  return string.sub(s, 2)      -- remove first comma
+function saveCsvTest()
+	local t = {}
+	t = table.load(tUser.luaFile)
+	mCsv.save( t, tUser.csvTestFile )
 end
 
 function parserTableForRidership()
 	local t = {}
-	t = table.load(userConstant.luaFile)
-	
+	t = table.load(tUser.luaFile)
+	saveCsvTest( t, filename )
 end
 
 --csv2table();
-saveTableTest();
+--saveTableTest();
+saveCsvTest()

@@ -1,11 +1,13 @@
 --csv解析
 
 
+-- 定义模块
+local p = {}
+
 -- 去掉字符串左空白
 local function trim_left(s)
 	return string.gsub(s, "^%s+", "");
 end
-
 
 -- 去掉字符串右空白
 local function trim_right(s)
@@ -123,7 +125,7 @@ end
 
 
 --解析csv文件
-function LoadCsv(fileName)
+function p.load(fileName)
 	local ret = {};
 
 	local file = io.open(fileName, "r")
@@ -147,6 +149,54 @@ function LoadCsv(fileName)
 end
 
 
+-----------------
+
+-- Used to escape "'s by toCSV
+local function escapeCSV (s)
+  if string.find(s, '[,"]') then
+    s = '"' .. string.gsub(s, '"', '""') .. '"'
+  end
+  return s
+end
+
+-- Convert from table to CSV string
+local function toCSV (tt)
+  local s = ""
+-- ChM 23.02.2014: changed pairs to ipairs 
+-- assumption is that fromCSV and toCSV maintain data as ordered array
+  for i, p in ipairs(tt) do
+	local stype = type( p )
+	if stype == "table" then
+		--s = s .. "\n"
+		for j, q in ipairs(p) do
+			if j == 1 then
+				s = s .. escapeCSV(q)
+			else
+				s = s .. "," .. escapeCSV(q)
+			end
+			--s = s .. escapeCSV(q) .. ","
+		end
+		
+		s = s .. "\r\n"
+	elseif i == 1 then
+		s = s .. escapeCSV(p)
+	else
+		s = s .. "," .. escapeCSV(p)
+	end
+  end
+  --return string.sub(s, 2)      -- remove first comma
+  return s
+end
+
+function p.save( tbl, filename )
+	local file,err = io.open( filename, "wb" )
+	if err then return err end
+	local s = toCSV (tbl)
+	file:write( s )
+	file:close()
+end
+
+return p
 --test
 --local t= LoadCsv("csvtesttxt.csv")
 --for k,v in pairs(t) do
