@@ -1,10 +1,10 @@
 local tUser = {
-	csvFile = "csvtest.csv";
-	luaFile = "csvtest.lua";
-	tableTestFile1 = "tabletest1.lua";
-	tableTestFile2 = "tabletest2.lua";
-	csvTestFile = "tabletest.csv";
-	csvOutputFile = "tableOutput.csv";
+	csvFile = "ANiu\\csvInput.csv";
+	--luaFile = "csvtest.lua";
+	--tableTestFile1 = "tabletest1.lua";
+	--tableTestFile2 = "tabletest2.lua";
+	--csvTestFile = "tabletest.csv";
+	csvOutputFile = "Outputs\\ANiuOutput.csv";
 };
 
 
@@ -28,17 +28,17 @@ local mCsv = require "csv2table"
     -- end
 -- end
 
-function csv2table()
-    local t = {}
-    t = mCsv.load(tUser.csvFile);
-    table.save( t, tUser.luaFile );
-end
+-- function csv2table()
+    -- local t = {}
+    -- t = mCsv.load(tUser.csvFile);
+    -- table.save( t, tUser.luaFile );
+-- end
 
-function saveCsvTest()
-	local t = {}
-	t = table.load(tUser.luaFile)
-	mCsv.save( t, tUser.csvTestFile )
-end
+-- function saveCsvTest()
+	-- local t = {}
+	-- t = table.load(tUser.luaFile)
+	-- mCsv.save( t, tUser.csvTestFile )
+-- end
 
 --[[ #地铁客流排行榜# 3月31日（周四），北京地铁路网客运量1168.62万，上海地铁客运量1019.8万，广州地铁客运量为720.8万， 深圳地铁路网客运量346.68万，南京地铁客运量为231.6万，武汉地铁客运量206.36万，成都地铁客运量139.33万。,
 	2016-04-01 12:39:00 来自 微博 weibo.com]]
@@ -141,9 +141,9 @@ function parserTableForRidership()
 	-- from 阿牛
 	t = mCsv.load(tUser.csvFile);
 	s = parserANiuTbl(t)
-	table.save( s, tUser.tableTestFile1 );
+	--table.save( s, tUser.tableTestFile1 );
 	local ss = kvTbl2ivTbl(s)
-	table.save( ss, tUser.tableTestFile2 );
+	--table.save( ss, tUser.tableTestFile2 );
 	mCsv.save( ss, tUser.csvOutputFile )
 end
 
