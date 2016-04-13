@@ -34,11 +34,6 @@ function csv2table()
     table.save( t, tUser.luaFile );
 end
 
-function saveTableTest()
-	local t = { {1},{2,},{5}}
-	table.save( t, tUser.tableTestFile );
-end
-
 function saveCsvTest()
 	local t = {}
 	t = table.load(tUser.luaFile)
@@ -90,6 +85,7 @@ function parserANiuLine(lineTbl)
 	str = lineTbl[2]
 	-- sData.DateSent.year, sData.DateSent.month, sData.DateSent.day = string.match(str, sParser.DateSent)
 	sData.DateSent = string.match(str, sParser.DateSent)
+	sData.RawMsg = lineTbl[1]
 
 	return sData
 end
@@ -140,9 +136,10 @@ end
 function parserTableForRidership()
 	local t = {}
 	local s = {}
-	t = table.load(tUser.luaFile)
-
+	-- t = table.load(tUser.luaFile)
+	
 	-- from °¢Å£
+	t = mCsv.load(tUser.csvFile);
 	s = parserANiuTbl(t)
 	table.save( s, tUser.tableTestFile1 );
 	local ss = kvTbl2ivTbl(s)
@@ -151,6 +148,5 @@ function parserTableForRidership()
 end
 
 --csv2table();
---saveTableTest();
-saveCsvTest()
+--saveCsvTest()
 parserTableForRidership();
