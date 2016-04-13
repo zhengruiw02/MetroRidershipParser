@@ -1,8 +1,10 @@
 local tUser = {
 	csvFile = "csvtest.csv";
 	luaFile = "csvtest.lua";
-	tableTestFile = "tabletest.lua";
+	tableTestFile1 = "tabletest1.lua";
+	tableTestFile2 = "tabletest2.lua";
 	csvTestFile = "tabletest.csv";
+	csvOutputFile = "tableOutput.csv";
 };
 
 
@@ -59,34 +61,70 @@ function parserANiuLine(lineTbl)
 	}
 	local sParser = {
 		DateInput = "(%d+)月(%d+)日",
-		WeekInput = "（(周%s+)）",
+		WeekInput = "（(周.-)）",
+		WeekInput2 = "（(.-)）",
 		Ridership = "%%city.-(%d+%.?%d*)万",
-		DateSent  = "(%d%d%d%d)-(%d%d)-(%d%d)",
+		RidershipSZ = "深圳.-(%d+%.?%d*)万",
+		DateSent  = "(%d%d%d%d%-%d%d%-%d%d)",
 	}
 	local sData = {
-		DateInput = {
-			month	= {},
-			day		= {},
-		},
-		WeekInput = {},
-		Riderships = {},
-		DateSent = {
-			year	= {},
-			month	= {},
-			day		= {},
-		}
+		-- DateInput = {
+			-- month	= {},
+			-- day		= {},
+		-- },
+		--WeekInput = {},
+		--Riderships = {},
+		-- DateSent = {
+			-- year	= {},
+			-- month	= {},
+			-- day		= {},
+		-- }
 	}
 	local str = lineTbl[1]
-	sData.DateInput.month, sData.DateInput.day = string.match(str, sParser.DateInput)
-	sData.WeekInput = string.match(str, sParser.WeekInput)
-	for k, v in ipairs(tCity) do
-		sData.Riderships.k = string.match(str, string.gsub(sParser.Ridership, "%city", v ))
+	-- sData.DateInput.month, sData.DateInput.day = string.match(str, sParser.DateInput)
+	sData.InputMonth, sData.InputDay = string.match(str, sParser.DateInput)
+	sData.InputWeek = string.match(str, sParser.WeekInput) or string.match(str, sParser.WeekInput2)
+	for k, v in pairs(tCity) do
+		sData[v] = string.match(str, string.gsub(sParser.Ridership, "%%city", v ))
 	end
 	str = lineTbl[2]
-	sData.DateSent.year, sData.DateSent.month, sData.DateSent.day = string.match(str, sParser.DateSent)
+	-- sData.DateSent.year, sData.DateSent.month, sData.DateSent.day = string.match(str, sParser.DateSent)
+	sData.DateSent = string.match(str, sParser.DateSent)
 
 	return sData
-	
+end
+
+function kvTbl2ivTbl(Tbl)
+	local ret = {}
+	local header = {}
+	local headerT = {}
+	for index, subTbl in ipairs(Tbl) do
+		if type(subTbl) == "table" then
+			local subTableRet = {}
+			for name, value in pairs(subTbl) do
+				if not headerT[name] then
+					table.insert(header, name)
+					headerT[name] = #header
+				end
+				local num = headerT[name]
+				subTableRet[num] = value
+			end
+			table.insert(ret, subTableRet)
+		else
+			table.insert(ret, subTbl)
+		end
+	end
+	for index, subTbl in ipairs(ret) do
+		if type(subTbl) == "table" then
+			--if (#subTbl ~= #header) then
+				for subIndex, value in pairs(header) do
+					if not subTbl[subIndex] then subTbl[subIndex] = " " end
+				end
+			--end
+		end
+	end
+	table.insert(ret, 1, header)
+	return ret
 end
 
 function parserANiuTbl(rawTbl)
@@ -106,8 +144,10 @@ function parserTableForRidership()
 
 	-- from 阿牛
 	s = parserANiuTbl(t)
-	table.save( s, tUser.tableTestFile );
-	--saveCsvTest( t, filename )
+	table.save( s, tUser.tableTestFile1 );
+	local ss = kvTbl2ivTbl(s)
+	table.save( ss, tUser.tableTestFile2 );
+	mCsv.save( ss, tUser.csvOutputFile )
 end
 
 --csv2table();
