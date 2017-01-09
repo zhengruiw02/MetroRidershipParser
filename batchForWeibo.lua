@@ -52,9 +52,15 @@ function parserANiuLine(lineTbl)
 		SZ = "深圳",
 		NJ = "南京",
 		WH = "武汉",
+		CQ = "重庆",
 		CD = "成都",
+		ZZ = "郑州",
+		CS = "长沙",
+		SZ1 = "苏州",
+		XA = "西安",
 	}
 	local sParser = {
+		TopicKW = "地铁客流排行榜",
 		DateInput = "(%d+)月(%d+)日",
 		WeekInput = "（(周.-)）",
 		WeekInput2 = "（(.-)）",
@@ -76,6 +82,16 @@ function parserANiuLine(lineTbl)
 		-- }
 	}
 	local str = lineTbl[1]
+	local isValid
+	
+	-- find out if we have TopicKW or not first!
+	
+	isValid = string.find(str, sParser.TopicKW)
+	if isValid == nil then
+		return nil
+	end
+	
+	
 	-- sData.DateInput.month, sData.DateInput.day = string.match(str, sParser.DateInput)
 	sData.InputMonth, sData.InputDay = string.match(str, sParser.DateInput)
 	sData.InputWeek = string.match(str, sParser.WeekInput) or string.match(str, sParser.WeekInput2)
@@ -128,7 +144,9 @@ function parserANiuTbl(rawTbl)
 	local lineData = {}
 	for k, lineTbl in ipairs(rawTbl) do
 		lineData = parserANiuLine(lineTbl)
-		table.insert(fullTbl, lineData)
+		if lineData ~= nil then
+			table.insert(fullTbl, lineData)
+		end
 	end
 	return fullTbl
 end
